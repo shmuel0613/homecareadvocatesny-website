@@ -313,7 +313,7 @@ footer { background: var(--navy-deep); color: #C9D8EA; padding-block: 44px; font
 
 <script>
 /* Set FORM_ENDPOINT to the Zoho CRM web form URL once it exists. Until then the form shows a preview notice and sends nothing. */
-var FORM_ENDPOINT = "";
+var FORM_ENDPOINT = "https://crm.zoho.com/crm/WebToLeadForm";
 (function () {
   var form = document.getElementById("lead-form");
   var msg = document.getElementById("form-msg");
@@ -323,7 +323,12 @@ var FORM_ENDPOINT = "";
     var ok = form.name.value.trim() && form.phone.value.trim() && /.+@.+\..+/.test(form.email.value) && form.consent.checked;
     if (!ok) { show("info", "Please add your name, phone and email, and tick the box to agree to calls and texts."); return; }
     if (!FORM_ENDPOINT) { show("info", "Preview only: this form is not connected yet, so nothing was sent."); return; }
-    var body = new URLSearchParams(new FormData(form));
+    var full = form.name.value.trim().replace(/\s+/g, " "), sp = full.indexOf(" ");
+    var body = new URLSearchParams();
+    body.set("xnQsjsdp", "9e711b36591a3cab516c1e0a4b56700e0a1f48bb8f8be599211342d498609032"); body.set("xmIwtLD", "886e6d00f3d9edcd2447c14d7cfa16edc37ad21b63409ac35de6e3268c666133226102ddae404ead592aa530db702395"); body.set("actionType", "TGVhZHM="); body.set("returnURL", "https://homecareadvocatesny.com/");
+    body.set("First Name", sp > 0 ? full.slice(0, sp) : ""); body.set("Last Name", sp > 0 ? full.slice(sp + 1) : full);
+    body.set("Phone", form.phone.value.trim()); body.set("Email", form.email.value.trim());
+    body.set("LEADCF17", (form.note.value.trim() + " [Agreed to calls/texts via website form]").trim());
     fetch(FORM_ENDPOINT, { method: "POST", mode: "no-cors", body: body }).then(function () {
       form.reset(); show("ok", "Thank you. We received your request and will reach out soon.");
     }).catch(function () { show("info", "Something went wrong sending your request. Please try again in a moment."); });
